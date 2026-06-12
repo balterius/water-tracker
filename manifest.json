@@ -1,11 +1,12 @@
 {
-  "name": "Hidratación",
-  "short_name": "Hidratación",
+  "name": "Water Tracker",
+  "short_name": "Water Tracker",
   "description": "Control diario de agua",
-  "start_url": "/",
+  "start_url": "/water-tracker/",
+  "scope": "/water-tracker/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#ffffff",
+  "background_color": "#1a6fcc",
+  "theme_color": "#1a6fcc",
   "orientation": "portrait",
   "icons": [
     {
