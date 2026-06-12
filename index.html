@@ -156,6 +156,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:va
 .status-msg.err{color:#dc2626}
 .sheet-section{margin-bottom:1.25rem}
 </style>
+<script>
+// Fix PWA start URL on iOS
+if(window.navigator.standalone && window.location.pathname === '/'){
+  window.location.replace('https://balterius.github.io/water-tracker/index.html');
+}
+</script>
 </head>
 <body>
 
@@ -349,7 +355,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:va
       <div id="log-list"><div class="log-empty">Sin registros aún</div></div>
     </div>
 
-    <div style="text-align:center;padding:.5rem 0 .25rem;font-size:11px;color:var(--text3)">v1.1.0</div>
+    <div style="text-align:center;padding:.5rem 0 .25rem;font-size:11px;color:var(--text3)">v1.1.1</div>
 
   </div>
 </div>

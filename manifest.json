@@ -2,15 +2,15 @@
   "name": "Water Tracker",
   "short_name": "Water Tracker",
   "description": "Control diario de agua",
-  "start_url": "https://balterius.github.io/water-tracker/index.html",
-  "scope": "https://balterius.github.io/water-tracker/",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#1a6fcc",
   "theme_color": "#1a6fcc",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "icon.png",
+      "src": "./icon.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
