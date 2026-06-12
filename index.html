@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Hidratación">
+<meta name="theme-color" content="#1a6fcc">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.png">
+<title>Hidratación</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bot:env(safe-area-inset-bottom,0px);
+  --blue1:#1a6fcc;--blue2:#2389f0;--blue3:#5aaeff;
+  --teal1:#0f9e72;--teal2:#14c48e;
+  --card:#ffffff;--cardborder:rgba(0,0,0,0.07);
+  --bg:#f0f6ff;--text:#0d1f3c;--text2:#5a7090;--text3:#9ab0cc;
+  --warn:#f59e0b;--warnbg:#fffbeb;--warnborder:#fde68a;
+  --radius:14px;--radius-lg:20px;--radius-xl:28px;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --card:#1a2540;--cardborder:rgba(255,255,255,0.07);
+    --bg:#0e1829;--text:#e8f1ff;--text2:#7a9dc0;--text3:#3a5a80;
+    --warnbg:#2a1e00;--warnborder:#7a5000;
+  }
+}
+html,body{height:100%;width:100%;overflow:hidden;background:var(--bg)}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:var(--text);display:flex;flex-direction:column}
+
+.app{flex:1;display:flex;flex-direction:column;max-width:430px;width:100%;margin:0 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+
+/* HEADER */
+.header{background:linear-gradient(135deg,var(--blue1) 0%,var(--blue2) 60%,var(--blue3) 100%);padding:calc(var(--safe-top) + 1.1rem) 1.25rem 1.5rem;position:relative;overflow:hidden;flex-shrink:0}
+.header::before{content:'';position:absolute;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,0.07);top:-60px;right:-50px}
+.header::after{content:'';position:absolute;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,0.05);bottom:-40px;left:20px}
+.topbar{display:flex;justify-content:space-between;align-items:flex-start;position:relative;z-index:1}
+.app-name{font-size:22px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px;letter-spacing:-0.3px}
+.app-date{font-size:12px;color:rgba(255,255,255,0.7);margin-top:3px}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.streak-pill{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.18);border-radius:99px;padding:5px 12px;font-size:12px;color:#fff;backdrop-filter:blur(4px)}
+.settings-btn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.18);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(4px)}
+.settings-btn:active{background:rgba(255,255,255,0.3)}
+
+/* RING HERO */
+.ring-hero{display:flex;flex-direction:column;align-items:center;padding:1.25rem 0 0;position:relative;z-index:1}
+.ring-wrap{position:relative;width:150px;height:150px}
+.ring-wrap svg.ring{width:150px;height:150px;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.2))}
+.ring-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.ring-pct{font-size:32px;font-weight:700;color:#fff;line-height:1}
+.ring-sub{font-size:11px;color:rgba(255,255,255,0.75);margin-top:3px}
+.ring-stats-row{display:flex;gap:0;margin-top:1rem;width:100%}
+.rstat{flex:1;text-align:center;padding:.5rem 0}
+.rstat+.rstat{border-left:1px solid rgba(255,255,255,0.2)}
+.rstat-label{font-size:10px;color:rgba(255,255,255,0.65);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px}
+.rstat-val{font-size:17px;font-weight:700;color:#fff}
+.rstat-unit{font-size:11px;font-weight:400;opacity:.8}
+
+/* CONTENT */
+.content{flex:1;padding:.75rem 1rem calc(var(--safe-bot) + 1rem);display:flex;flex-direction:column;gap:.75rem}
+
+.weather-bar{display:flex;align-items:center;gap:8px;background:var(--card);border-radius:var(--radius);padding:9px 14px;font-size:12px;color:var(--text2);border:0.5px solid var(--cardborder)}
+.weather-bar.warm{background:#fffbeb;border-color:#fde68a;color:#92400e}
+.weather-bar.hot{background:#fff1f0;border-color:#fca5a5;color:#991b1b}
+@media(prefers-color-scheme:dark){.weather-bar.warm{background:#2a1e00;border-color:#7a5000;color:#fbbf24}.weather-bar.hot{background:#2a0000;border-color:#7a0000;color:#f87171}}
+
+.suggest-banner{display:flex;align-items:flex-start;gap:10px;border-radius:var(--radius);padding:10px 14px;border:0.5px solid;font-size:12px;line-height:1.5}
+.suggest-banner.info{background:#eff6ff;border-color:#bfdbfe;color:#1e40af}
+.suggest-banner.warn{background:var(--warnbg);border-color:var(--warnborder);color:#92400e}
+@media(prefers-color-scheme:dark){.suggest-banner.info{background:#0c1e3a;border-color:#1e40af;color:#93c5fd}}
+
+.cel-card{background:linear-gradient(135deg,var(--teal1),var(--teal2));border-radius:var(--radius-lg);padding:1.25rem;text-align:center;display:none}
+.cel-card.show{display:block}
+.cel-emoji{font-size:36px;margin-bottom:6px}
+.cel-title{font-size:16px;font-weight:700;color:#fff;margin-bottom:4px}
+.cel-msg{font-size:13px;color:rgba(255,255,255,.85);line-height:1.4}
+
+/* ADD CARD */
+.add-card{background:var(--card);border-radius:var(--radius-lg);padding:1.1rem;border:0.5px solid var(--cardborder)}
+.section-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;font-weight:600}
+.quick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+.qbtn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px;border-radius:12px;border:none;cursor:pointer;transition:transform .12s;position:relative;overflow:hidden}
+.qbtn:active{transform:scale(0.93)}
+.qbtn.q250{background:#e8f4ff}
+.qbtn.q330{background:#e8fff6}
+.qbtn.q500{background:#fff0e8}
+.qbtn.q1000{background:#f0e8ff}
+@media(prefers-color-scheme:dark){
+  .qbtn.q250{background:#0c2a45}.qbtn.q330{background:#04342C}
+  .qbtn.q500{background:#2a1400}.qbtn.q1000{background:#1e0a3c}
+}
+.qbtn-ml{font-size:13px;font-weight:700;color:var(--text)}
+.qbtn-sub{font-size:10px;color:var(--text2)}
+.custom-row{display:flex;gap:8px}
+.custom-row input{flex:1;height:42px;padding:0 12px;border:1.5px solid #d1e4ff;border-radius:12px;background:var(--bg);color:var(--text);font-size:14px;-webkit-appearance:none;outline:none}
+.custom-row input:focus{border-color:var(--blue2)}
+@media(prefers-color-scheme:dark){.custom-row input{border-color:#1e3a60;background:#0e1829}}
+.add-btn{height:42px;padding:0 16px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--blue1),var(--blue2));color:#fff;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap;box-shadow:0 2px 8px rgba(26,111,204,.35)}
+.add-btn:active{opacity:.85;transform:scale(0.97)}
+
+/* LOG */
+.log-card{background:var(--card);border-radius:var(--radius-lg);padding:1.1rem;border:0.5px solid var(--cardborder)}
+.log-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.log-count{font-size:12px;color:var(--text2)}
+.log-empty{font-size:13px;color:var(--text2);text-align:center;padding:.8rem 0}
+.log-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(0,0,0,0.05)}
+.log-item:last-child{border-bottom:none}
+@media(prefers-color-scheme:dark){.log-item{border-bottom-color:rgba(255,255,255,0.05)}}
+.log-dot{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#e8f4ff,#c8e4ff);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+@media(prefers-color-scheme:dark){.log-dot{background:linear-gradient(135deg,#0c2a45,#1a3a60)}}
+.log-info{flex:1}
+.log-ml{font-size:14px;font-weight:700;color:var(--text)}
+.log-time{font-size:11px;color:var(--text2)}
+.log-del{background:none;border:none;cursor:pointer;padding:4px 6px;border-radius:8px;display:flex;align-items:center;opacity:.5}
+.log-del:active{opacity:1}
+
+.next-bar{background:var(--card);border-radius:var(--radius);padding:9px 14px;font-size:12px;color:var(--text2);border:0.5px solid var(--cardborder);text-align:center}
+
+/* SHEET */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:100;align-items:flex-end;justify-content:center}
+.overlay.show{display:flex}
+.sheet{background:var(--card);border-radius:24px 24px 0 0;width:100%;max-width:430px;padding:0 1.25rem calc(var(--safe-bot) + 1.5rem);max-height:88vh;overflow-y:auto}
+.sheet-handle{width:40px;height:4px;background:var(--text3);border-radius:99px;margin:14px auto 20px;opacity:.4}
+.sheet-title{font-size:18px;font-weight:700;color:var(--text);margin-bottom:1.25rem;text-align:center}
+.sheet-sec-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;font-weight:600}
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.pfield{display:flex;flex-direction:column;gap:5px}
+.pfield label{font-size:12px;color:var(--text2);font-weight:500}
+.pfield input,.pfield select{height:44px;padding:0 12px;border:1.5px solid #d1e4ff;border-radius:12px;background:var(--bg);color:var(--text);font-size:14px;width:100%;-webkit-appearance:none;outline:none}
+.pfield input:focus,.pfield select:focus{border-color:var(--blue2)}
+@media(prefers-color-scheme:dark){.pfield input,.pfield select{border-color:#1e3a60;background:#0e1829}}
+.sheet-save{width:100%;height:44px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--blue1),var(--blue2));color:#fff;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:8px;box-shadow:0 2px 8px rgba(26,111,204,.3)}
+.sheet-save:active{opacity:.85}
+.sheet-divider{height:1px;background:var(--cardborder);margin:0 0 1.25rem}
+.notif-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.notif-info{display:flex;align-items:center;gap:10px}
+.notif-lbl{font-size:14px;font-weight:600;color:var(--text)}
+.notif-sub{font-size:12px;color:var(--text2);margin-top:1px}
+.toggle-wrap{position:relative;width:48px;height:28px;flex-shrink:0}
+.toggle-wrap input{opacity:0;width:0;height:0;position:absolute}
+.toggle-slider{position:absolute;inset:0;background:#d0daea;border-radius:99px;cursor:pointer;transition:background .2s}
+.toggle-slider:before{content:'';position:absolute;width:22px;height:22px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:0 1px 4px rgba(0,0,0,0.25)}
+.toggle-wrap input:checked+.toggle-slider{background:var(--blue2)}
+.toggle-wrap input:checked+.toggle-slider:before{transform:translateX(20px)}
+.notif-times{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.tfield{display:flex;flex-direction:column;gap:5px}
+.tfield label{font-size:12px;color:var(--text2);font-weight:500}
+.tfield input{height:44px;padding:0 12px;border:1.5px solid #d1e4ff;border-radius:12px;background:var(--bg);color:var(--text);font-size:14px;width:100%;outline:none}
+@media(prefers-color-scheme:dark){.tfield input{border-color:#1e3a60;background:#0e1829}}
+.status-msg{font-size:12px;text-align:center;padding:4px 0;min-height:18px}
+.status-msg.ok{color:var(--teal1)}
+.status-msg.err{color:#dc2626}
+.sheet-section{margin-bottom:1.25rem}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <div class="topbar">
+      <div>
+        <div class="app-name">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c0 0-7 8.5-7 13a7 7 0 0 0 14 0c0-4.5-7-13-7-13z"/></svg>
+          Hidratación
+        </div>
+        <div class="app-date" id="date-lbl"></div>
+      </div>
+      <div class="topbar-right">
+        <div class="streak-pill">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c1 3.5 5 7 5 11a5 5 0 0 1-10 0c0-4 4-7.5 5-11z"/></svg>
+          <span id="streak-lbl">0 días</span>
+        </div>
+        <button class="settings-btn" onclick="openSettings()" aria-label="Ajustes">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="ring-hero">
+      <div class="ring-wrap">
+        <svg class="ring" viewBox="0 0 150 150">
+          <circle cx="75" cy="75" r="62" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="11"/>
+          <circle cx="75" cy="75" r="62" fill="none" stroke="#fff" stroke-width="11"
+            stroke-linecap="round" stroke-dasharray="390" stroke-dashoffset="390"
+            transform="rotate(-90 75 75)" id="ring-arc" style="transition:stroke-dashoffset .6s cubic-bezier(.4,0,.2,1)"/>
+        </svg>
+        <div class="ring-center">
+          <div class="ring-pct" id="ring-pct">0%</div>
+          <div class="ring-sub">del objetivo</div>
+        </div>
+      </div>
+      <div class="ring-stats-row">
+        <div class="rstat"><div class="rstat-label">Consumido</div><div class="rstat-val" id="rs-consumed">0 <span class="rstat-unit">ml</span></div></div>
+        <div class="rstat"><div class="rstat-label">Objetivo</div><div class="rstat-val" id="rs-goal">— <span class="rstat-unit">ml</span></div></div>
+        <div class="rstat"><div class="rstat-label">Restante</div><div class="rstat-val" id="rs-remain">— <span class="rstat-unit">ml</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <div id="weather-bar" class="weather-bar" style="display:none">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="weather-icon"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <span id="weather-text">Cargando previsión...</span>
+    </div>
+
+    <div id="suggest-area"></div>
+
+    <div class="cel-card" id="celebration">
+      <div class="cel-emoji" id="cel-emoji">🎉</div>
+      <div class="cel-title" id="cel-title"></div>
+      <div class="cel-msg" id="cel-msg"></div>
+    </div>
+
+    <div id="next-bar" class="next-bar" style="display:none"></div>
+
+    <div class="add-card">
+      <div class="section-label">Añadir agua</div>
+      <div class="quick-grid">
+        <button class="qbtn q250" onclick="addWater(250)">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1a6fcc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8l1 9H7z"/><path d="M7 12c0 5 10 5 10 0"/></svg>
+          <span class="qbtn-ml">250</span><span class="qbtn-sub">vaso</span>
+        </button>
+        <button class="qbtn q330" onclick="addWater(330)">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0f9e72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="3" width="8" height="18" rx="2"/><line x1="10" y1="7" x2="14" y2="7"/></svg>
+          <span class="qbtn-ml">330</span><span class="qbtn-sub">lata</span>
+        </button>
+        <button class="qbtn q500" onclick="addWater(500)">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6l1 3H8z"/><path d="M8 6h8l1 14H7z"/></svg>
+          <span class="qbtn-ml">500</span><span class="qbtn-sub">botella</span>
+        </button>
+        <button class="qbtn q1000" onclick="addWater(1000)">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6l1 4H8z"/><path d="M8 6h8l1.5 15H6.5z"/></svg>
+          <span class="qbtn-ml">1000</span><span class="qbtn-sub">litro</span>
+        </button>
+      </div>
+      <div class="custom-row">
+        <input type="number" id="custom-ml" placeholder="Cantidad en ml" min="1" max="2000" inputmode="numeric">
+        <button class="add-btn" onclick="addCustom()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Añadir
+        </button>
+      </div>
+    </div>
+
+    <div class="log-card">
+      <div class="log-hdr">
+        <span class="section-label" style="margin:0">Registro de hoy</span>
+        <span class="log-count" id="log-count">0 tomas</span>
+      </div>
+      <div id="log-list"><div class="log-empty">Sin registros aún</div></div>
+    </div>
+
+  </div>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeOut(event)">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Ajustes</div>
+
+    <div class="sheet-section">
+      <div class="sheet-sec-label">Perfil</div>
+      <div class="pgrid">
+        <div class="pfield"><label>Edad (años)</label><input type="number" id="p-age" min="10" max="99" inputmode="numeric"></div>
+        <div class="pfield"><label>Peso (kg)</label><input type="number" id="p-weight" min="30" max="200" inputmode="numeric"></div>
+        <div class="pfield" style="grid-column:1/-1"><label>Actividad</label>
+          <select id="p-activity">
+            <option value="0">Sedentario</option>
+            <option value="200" selected>Activo moderado</option>
+            <option value="400">Muy activo / deporte</option>
+          </select>
+        </div>
+      </div>
+      <button class="sheet-save" onclick="saveProfile()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Guardar perfil
+      </button>
+      <div class="status-msg" id="profile-status"></div>
+    </div>
+
+    <div class="sheet-divider"></div>
+
+    <div class="sheet-section">
+      <div class="sheet-sec-label">Recordatorios</div>
+      <div class="notif-row">
+        <div class="notif-info">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--blue2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <div>
+            <div class="notif-lbl">Activar recordatorios</div>
+            <div class="notif-sub">Cada 2 horas en el horario elegido</div>
+          </div>
+        </div>
+        <label class="toggle-wrap">
+          <input type="checkbox" id="notif-toggle" onchange="toggleNotif()">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="notif-times">
+        <div class="tfield"><label>Desde</label><input type="time" id="notif-from" value="09:00"></div>
+        <div class="tfield"><label>Hasta</label><input type="time" id="notif-to" value="22:00"></div>
+      </div>
+      <button class="sheet-save" onclick="saveNotif()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Guardar horario
+      </button>
+      <div class="status-msg" id="notif-status"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const KL='h2o_log',KP='h2o_profile',KS='h2o_streak',KD='h2o_last',KN='h2o_notif',KW='h2o_weather';
+let profile={age:43,weight:93,activity:300};
+let weatherTemp=null,log=[],streak=parseInt(localStorage.getItem(KS)||'0');
+let notif={enabled:false,from:'09:00',to:'22:00'};
+let nTimer=null,celebrated=false;
+const LEON={lat:42.5987,lon:-5.5671};
+
+const JOKES=[
+  {e:'🏆',t:'¡Objetivo cumplido!',m:'Tu riñón te manda un abrazo. Bueno, dos. Tiene dos.'},
+  {e:'🐟',t:'¡Meta alcanzada!',m:'Estás tan hidratado que hasta los peces te tienen envidia.'},
+  {e:'💧',t:'¡Lo has conseguido!',m:'Hoy tu cuerpo está más contento que una esponja en el océano.'},
+  {e:'🥇',t:'¡Objetivo superado!',m:'Si fueras planta, estarías floreciendo ahora mismo.'},
+  {e:'🚿',t:'¡Bien hidratado!',m:'Sigues así y serás el 70% de agua que siempre quisiste ser.'},
+];
+const REMINDERS=[
+  '¡Ey! Tu cuerpo lleva un rato mirándote con cara de sed.',
+  'El agua no va a beberse sola. Bueno, técnicamente sí, pero no en ti.',
+  'Han pasado 2 horas. Tu riñón ha mandado un WhatsApp.',
+  'Bebe agua. Tu piel te lo agradecerá aunque no lo diga en voz alta.',
+  '¿Sigues vivo? Bien. Ahora bebe agua.',
+  'Alerta de planta marchita en progreso. Riega el sistema.',
+];
+const SVG_DROP=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue2)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c0 0-7 8.5-7 13a7 7 0 0 0 14 0c0-4.5-7-13-7-13z"/></svg>`;
+const SVG_X=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+
+function today(){return new Date().toISOString().slice(0,10)}
+function tempMod(t){if(t===null)return 0;if(t<15)return 0;if(t<25)return 100;if(t<35)return 200;return 300}
+function calcGoal(){const base=2000,a=profile.age>65?-200:profile.age>55?-100:0;return Math.max(1500,base+profile.activity+tempMod(weatherTemp)+a)}
+
+async function fetchWeather(){
+  const d=today(),c=localStorage.getItem(KW);
+  if(c){const p=JSON.parse(c);if(p.date===d){weatherTemp=p.temp;showWeather(p.temp);render();return}}
+  try{
+    const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LEON.lat}&longitude=${LEON.lon}&daily=temperature_2m_max&forecast_days=1&timezone=Europe%2FMadrid`);
+    const j=await r.json();const t=Math.round(j.daily.temperature_2m_max[0]);
+    weatherTemp=t;localStorage.setItem(KW,JSON.stringify({date:d,temp:t}));showWeather(t);render();
+  }catch{weatherTemp=null;showWeather(null);render()}
+}
+function showWeather(t){
+  const bar=document.getElementById('weather-bar'),txt=document.getElementById('weather-text');
+  bar.style.display='flex';
+  if(t===null){bar.className='weather-bar';txt.textContent='No se pudo obtener la previsión de León';return}
+  let cls='weather-bar',lb='templado';
+  if(t<15)lb='frío';else if(t<25)lb='templado';else if(t<35){cls='weather-bar warm';lb='caluroso';}else{cls='weather-bar hot';lb='muy caluroso';}
+  bar.className=cls;txt.textContent=`León hoy: ${t}°C · ${lb} · objetivo ajustado`;
+}
+
+function loadProfile(){const r=localStorage.getItem(KP);if(r)profile=JSON.parse(r);document.getElementById('p-age').value=profile.age||'';document.getElementById('p-weight').value=profile.weight||'';document.getElementById('p-activity').value=profile.activity||200}
+function saveProfile(){profile={age:parseInt(document.getElementById('p-age').value)||43,weight:parseInt(document.getElementById('p-weight').value)||93,activity:parseInt(document.getElementById('p-activity').value)};localStorage.setItem(KP,JSON.stringify(profile));render();showMsg('profile-status','ok','Perfil guardado')}
+
+function loadLog(){const r=localStorage.getItem(KL+'_'+today());log=r?JSON.parse(r):[];celebrated=!!localStorage.getItem('h2o_cel_'+today())}
+function savLog(){localStorage.setItem(KL+'_'+today(),JSON.stringify(log));checkStreak()}
+function checkStreak(){
+  const d=today(),last=localStorage.getItem(KD),goal=calcGoal(),total=log.reduce((s,e)=>s+e.ml,0);
+  if(total>=goal&&last!==d){const yd=new Date();yd.setDate(yd.getDate()-1);streak=(last===yd.toISOString().slice(0,10))?streak+1:1;localStorage.setItem(KS,streak);localStorage.setItem(KD,d)}
+  document.getElementById('streak-lbl').textContent=streak+' día'+(streak!==1?'s':'');
+}
+function addWater(ml){const n=new Date(),hm=n.getHours().toString().padStart(2,'0')+':'+n.getMinutes().toString().padStart(2,'0');log.push({ml,time:hm,id:Date.now()});savLog();render()}
+function addCustom(){const v=parseInt(document.getElementById('custom-ml').value);if(!v||v<1||v>2000)return;addWater(v);document.getElementById('custom-ml').value=''}
+function delEntry(id){log=log.filter(e=>e.id!==id);savLog();render()}
+
+function celebrate(){
+  if(celebrated)return;celebrated=true;localStorage.setItem('h2o_cel_'+today(),'1');
+  const j=JOKES[Math.floor(Math.random()*JOKES.length)];
+  document.getElementById('cel-emoji').textContent=j.e;document.getElementById('cel-title').textContent=j.t;document.getElementById('cel-msg').textContent=j.m;
+  document.getElementById('celebration').classList.add('show');
+  if('Notification' in window&&Notification.permission==='granted')new Notification(j.t,{body:j.m,icon:'icon.png'});
+}
+
+function render(){
+  const goal=calcGoal(),total=log.reduce((s,e)=>s+e.ml,0),remain=Math.max(0,goal-total);
+  const pct=Math.min(100,Math.round(total/goal*100)),done=total>=goal,h=new Date().getHours();
+  if(done)celebrate();else{document.getElementById('celebration').classList.remove('show');celebrated=false;localStorage.removeItem('h2o_cel_'+today())}
+  document.getElementById('rs-consumed').innerHTML=total+' <span class="rstat-unit">ml</span>';
+  document.getElementById('rs-goal').innerHTML=goal+' <span class="rstat-unit">ml</span>';
+  document.getElementById('rs-remain').innerHTML=remain+' <span class="rstat-unit">ml</span>';
+  document.getElementById('ring-pct').textContent=pct+'%';
+  document.getElementById('ring-arc').style.strokeDashoffset=Math.round(390*(1-pct/100));
+  const nb=document.getElementById('next-bar');
+  if(remain>0){nb.style.display='block';nb.textContent='~'+Math.round(remain/Math.max(1,22-h))+' ml/hora para llegar al objetivo antes de las 22h'}else nb.style.display='none';
+  const p=pct/100,sa=document.getElementById('suggest-area');
+  let sug=null;const age=profile.age,act=profile.activity;
+  if(weatherTemp>=35&&p<.5&&h>=10)sug={t:'warn',m:'Con el calor de hoy en León sudas más. Bebe cada 30 min aunque no tengas sed.'};
+  else if(act>=600&&p<.6)sug={t:'warn',m:'Con actividad intensa, repón líquidos antes, durante y después del ejercicio.'};
+  else if(age>=55&&p<.5&&h>=12)sug={t:'info',m:'A partir de los 55 años la sed disminuye. Recuerda beber aunque no la notes.'};
+  else if(p>=.5&&h>=18&&p<1)sug={t:'warn',m:'Tarde y aún a la mitad. Acelera el ritmo para alcanzar el objetivo.'};
+  sa.innerHTML=sug?`<div class="suggest-banner ${sug.t}"><span>${sug.m}</span></div>`:'';
+  const ll=document.getElementById('log-list');
+  document.getElementById('log-count').textContent=log.length+' toma'+(log.length!==1?'s':'');
+  ll.innerHTML=log.length===0?'<div class="log-empty">Sin registros aún</div>':[...log].reverse().map(e=>`
+    <div class="log-item">
+      <div class="log-dot">${SVG_DROP}</div>
+      <div class="log-info"><div class="log-ml">${e.ml} ml</div><div class="log-time">${e.time}</div></div>
+      <button class="log-del" onclick="delEntry(${e.id})" aria-label="Eliminar">${SVG_X}</button>
+    </div>`).join('');
+}
+
+function openSettings(){document.getElementById('overlay').classList.add('show')}
+function closeSettings(){document.getElementById('overlay').classList.remove('show')}
+function closeOut(e){if(e.target===document.getElementById('overlay'))closeSettings()}
+
+function loadNotif(){const r=localStorage.getItem(KN);if(r)notif=JSON.parse(r);document.getElementById('notif-toggle').checked=notif.enabled;document.getElementById('notif-from').value=notif.from;document.getElementById('notif-to').value=notif.to}
+function saveNotif(){notif.from=document.getElementById('notif-from').value;notif.to=document.getElementById('notif-to').value;localStorage.setItem(KN,JSON.stringify(notif));schedNotif();showMsg('notif-status','ok','Horario guardado')}
+function toggleNotif(){
+  notif.enabled=document.getElementById('notif-toggle').checked;
+  if(notif.enabled){
+    if(!('Notification' in window)){showMsg('notif-status','err','Tu navegador no soporta notificaciones');document.getElementById('notif-toggle').checked=false;notif.enabled=false;return}
+    Notification.requestPermission().then(p=>{if(p==='granted'){localStorage.setItem(KN,JSON.stringify(notif));schedNotif();showMsg('notif-status','ok','Notificaciones activadas')}else{document.getElementById('notif-toggle').checked=false;notif.enabled=false;showMsg('notif-status','err','Permiso denegado. Actívalo en Ajustes > Safari')}});
+  }else{if(nTimer)clearInterval(nTimer);nTimer=null;localStorage.setItem(KN,JSON.stringify(notif));showMsg('notif-status','','Recordatorios desactivados')}
+}
+function schedNotif(){
+  if(nTimer)clearInterval(nTimer);nTimer=null;
+  if(!notif.enabled||Notification.permission!=='granted')return;
+  nTimer=setInterval(()=>{
+    const n=new Date(),h=n.getHours(),m=n.getMinutes();
+    const fp=notif.from.split(':').map(Number),tp=notif.to.split(':').map(Number);
+    const nm=h*60+m,fm=fp[0]*60+fp[1],tm=tp[0]*60+tp[1];
+    if(nm>=fm&&nm<=tm){const goal=calcGoal(),total=log.reduce((s,e)=>s+e.ml,0);if(total<goal)new Notification('💧 Hidratación',{body:REMINDERS[Math.floor(Math.random()*REMINDERS.length)],icon:'icon.png'})}
+  },2*60*60*1000);
+}
+function showMsg(id,type,msg){const el=document.getElementById(id);el.textContent=msg;el.className='status-msg'+(type?' '+type:'');if(msg)setTimeout(()=>{el.textContent='';el.className='status-msg'},3000)}
+
+function initDate(){const d=new Date(),s=d.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'});document.getElementById('date-lbl').textContent=s.charAt(0).toUpperCase()+s.slice(1)}
+
+loadProfile();loadLog();loadNotif();initDate();checkStreak();render();fetchWeather();
+if(notif.enabled&&'Notification' in window&&Notification.permission==='granted')schedNotif();
+</script>
+</body>
+</html>
